@@ -15,10 +15,10 @@ export async function POST(request: NextRequest) {
 type MCQ = {
   question: string;
   choices: [string, string, string, string];
-  answer: 0 | 1 | 2 | 3;
+  answer_index: 0 | 1 | 2 | 3;
 };
 
-async function text2json(text: string): Promise<MCQ> {
+async function text2json(text: string): Promise<MCQ[]> {
   const response = await client.responses.create({
     model: "gpt-5-mini",
     input: [
@@ -27,33 +27,45 @@ async function text2json(text: string): Promise<MCQ> {
     text: {
       format: {
         type: "json_schema",
-        name: "mcq",
+        name: "mcq_set",
         schema: {
           type: "object",
           properties: {
-            question: {
-              type: "string",
-              description: "Question",
-            },
-            choices: {
+            mcqs: {
               type: "array",
-              description: "Choices",
               items: {
-                type: "string",
+                type: "object",
+                properties: {
+                  question: {
+                    type: "string",
+                    description: "Question",
+                  },
+                  choices: {
+                    type: "array",
+                    description: "Choices",
+                    items: {
+                      type: "string",
+                    },
+                    minItems: 4,
+                    maxItems: 4,
+                  },
+                  answer_index: {
+                    type: "integer",
+                    description: "Answer index",
+                    enum: [0, 1, 2, 3],
+                  },
+                },
+                required: [
+                  "question",
+                  "choices",
+                  "answer_index",
+                ],
+                additionalProperties: false,
               },
-              minItems: 4,
-              maxItems: 4,
-            },
-            answer: {
-              type: "integer",
-              description: "Answer index",
-              enum: [0, 1, 2, 3],
             },
           },
           required: [
-            "question",
-            "choices",
-            "answer",
+            "mcqs"
           ],
           additionalProperties: false,
         },
@@ -61,5 +73,6 @@ async function text2json(text: string): Promise<MCQ> {
     },
   });
 
-  return JSON.parse(response.output_text);
+  const json = JSON.parse(response.output_text);
+  return json.mcqs;
 }
