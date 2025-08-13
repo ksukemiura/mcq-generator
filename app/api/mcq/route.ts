@@ -8,7 +8,7 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(request: NextRequest) {
   const { text } = await request.json();
-  const result = await text2json(text);
+  const result = await generateMcqsFromText(text);
   return NextResponse.json(result);
 }
 
@@ -18,7 +18,7 @@ type MCQ = {
   answer_index: 0 | 1 | 2 | 3;
 };
 
-async function text2json(text: string): Promise<MCQ[]> {
+async function generateMcqsFromText(text: string): Promise<MCQ[]> {
   const response = await client.responses.create({
     model: "gpt-5-mini",
     input: [
