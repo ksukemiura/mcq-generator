@@ -65,7 +65,7 @@ async function generateMcqsFromText(text: string): Promise<MCQ[]> {
             },
           },
           required: [
-            "mcqs"
+            "mcqs",
           ],
           additionalProperties: false,
         },
