@@ -12,11 +12,9 @@ type MCQ = {
 export default function Page() {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
     setLoading(true);
 
     const form = e.currentTarget;
@@ -24,7 +22,6 @@ export default function Page() {
     const text = String(formData.get("text") || "").trim();
 
     if (!text) {
-      setError("Please enter a question");
       setLoading(false);
       return;
     }
@@ -89,7 +86,7 @@ export default function Page() {
         throw error3;
       }
     } catch (error: any) {
-      setError(error?.message || "Something went wrong");
+      console.error(error?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
