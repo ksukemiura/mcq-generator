@@ -19,7 +19,7 @@ export default function Page() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-    const text = String(formData.get("text") || "").trim();
+    const text = String(formData.get("text")).trim();
 
     if (!text) {
       setLoading(false);
