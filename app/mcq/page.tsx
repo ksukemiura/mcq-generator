@@ -1,6 +1,7 @@
 "use client";
 
 import React, { FormEvent, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 type MCQ = {
   question: string;
@@ -9,15 +10,14 @@ type MCQ = {
 };
 
 export default function Page() {
+  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mcqs, setMcqs] = useState<MCQ[] | null>(null);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    setMcqs(null);
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -41,8 +41,53 @@ export default function Page() {
         throw new Error(`Request failed: ${res.status} ${text}`);
       }
 
-      const data: MCQ[] = await res.json();
-      setMcqs(data);
+      const mcqs: MCQ[] = await res.json();
+
+      // 1. Create a new mcq_set
+      const mcqSetId = crypto.randomUUID();
+      const title = "test";
+      const { error: error1 } = await supabase
+          .from("mcq_sets")
+          .insert([
+            {
+              id: mcqSetId,
+              title: title,
+            },
+          ]);
+      if (error1) {
+        throw error1;
+      }
+
+      // 2. Insert mcqs into mcq_set
+      const mcqQuestions = mcqs?.map((mcq) => ({
+        id: crypto.randomUUID(),
+        mcq_set_id: mcqSetId,
+        question: mcq.question,
+      }));
+      const { error: error2 } = await supabase
+        .from("mcq_questions")
+        .insert(mcqQuestions);
+      if (error2) {
+        throw error2;
+      }
+
+      // 3. Return mcq_set_id
+      const mcqQuestionIds = mcqQuestions?.map((mcqQuestion) => (mcqQuestion.id));
+      console.log("mcqQuestionIds: ", mcqQuestionIds);
+      const mcqChoices = mcqs?.flatMap(({ choices, answer_index }, i) => (
+        choices.map((choice, j) => ({
+          mcq_question_id: mcqQuestionIds?.[i],
+          choice,
+          is_correct: j === answer_index,
+        }))
+      ));
+      console.log("mcqChoices: ", mcqChoices);
+      const { error: error3 } = await supabase
+        .from("mcq_choices")
+        .insert(mcqChoices);
+      if (error3) {
+        throw error3;
+      }
     } catch (error: any) {
       setError(error?.message || "Something went wrong");
     } finally {
@@ -58,28 +103,6 @@ export default function Page() {
           {loading ? "Generating…" : "Generate MCQ"}
         </button>
       </form>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {mcqs && mcqs.length > 0 && (
-        <div>
-          <h2>Generated MCQs</h2>
-          <ol>
-            {mcqs.map((mcq, idx) => (
-              <li key={idx}>
-                <p>{mcq.question}</p>
-                <ul>
-                  {mcq.choices.map((c, i) => (
-                    <li key={i}>
-                      {String.fromCharCode(65 + i)}. {c} {i === mcq.answer_index ? "(Answer)" : ""}
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
     </>
   );
 }
