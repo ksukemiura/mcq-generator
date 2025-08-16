@@ -2,6 +2,7 @@
 
 import React, { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import styles from "./page.module.css";
 
 type MCQ = {
   question: string;
@@ -93,9 +94,21 @@ export default function Page() {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <textarea name="text" placeholder="Enter your question" required />
-        <button type="submit" disabled={loading}>
+      <form
+        onSubmit={handleSubmit}
+        className={styles.form}
+      >
+        <textarea
+          name="text"
+          placeholder="Enter your question"
+          required
+          className={styles.textarea}
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className={styles.button}
+        >
           {loading ? "Generating…" : "Generate MCQ"}
         </button>
       </form>
