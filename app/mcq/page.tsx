@@ -40,55 +40,54 @@ export default function Page() {
 
       const mcqs: MCQ[] = await res.json();
 
-      // 1. Create a new mcq_set
-      const mcqSetId = crypto.randomUUID();
-      const title = "test";
-      const { error: error1 } = await supabase
-          .from("mcq_sets")
-          .insert([
-            {
-              id: mcqSetId,
-              title: title,
-            },
-          ]);
-      if (error1) {
-        throw error1;
-      }
-
-      // 2. Insert mcqs into mcq_set
-      const mcqQuestions = mcqs?.map((mcq) => ({
-        id: crypto.randomUUID(),
-        mcq_set_id: mcqSetId,
-        question: mcq.question,
-      }));
-      const { error: error2 } = await supabase
-        .from("mcq_questions")
-        .insert(mcqQuestions);
-      if (error2) {
-        throw error2;
-      }
-
-      // 3. Return mcq_set_id
-      const mcqQuestionIds = mcqQuestions?.map((mcqQuestion) => (mcqQuestion.id));
-      console.log("mcqQuestionIds: ", mcqQuestionIds);
-      const mcqChoices = mcqs?.flatMap(({ choices, answer_index }, i) => (
-        choices.map((choice, j) => ({
-          mcq_question_id: mcqQuestionIds?.[i],
-          choice,
-          is_correct: j === answer_index,
-        }))
-      ));
-      console.log("mcqChoices: ", mcqChoices);
-      const { error: error3 } = await supabase
-        .from("mcq_choices")
-        .insert(mcqChoices);
-      if (error3) {
-        throw error3;
-      }
+      await saveMcqSet(mcqs, "test");
     } catch (error: any) {
       console.error(error?.message || "Something went wrong");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function saveMcqSet(mcqs: MCQ[], title: string) {
+    // Save a MCQ set into Supabase
+    const mcqSetId = crypto.randomUUID();
+    const { error: error1 } = await supabase
+      .from("mcq_sets")
+      .insert({
+        id: mcqSetId,
+        title: title,
+      });
+    if (error1) {
+      throw error1;
+    }
+
+    // Save MCQ questions into Supabase
+    const mcqQuestionIds = Array.from({ length: mcqs.length }, () => crypto.randomUUID());
+    const mcqQuestions = mcqs.map((mcq, questionIndex) => ({
+      id: mcqQuestionIds[questionIndex],
+      mcq_set_id: mcqSetId,
+      question: mcq.question,
+    }));
+    const { error: error2 } = await supabase
+      .from("mcq_questions")
+      .insert(mcqQuestions);
+    if (error2) {
+      throw error2;
+    }
+
+    // Save MCQ choices into Supabase
+    const mcqChoices = mcqs.flatMap(({ choices, answerIndex }, questionIndex) => (
+      choices.map((choice, choiceIndex) => ({
+        mcq_question_id: mcqQuestionIds[questionIndex],
+        choice: choice,
+        is_correct: choiceIndex === answerIndex,
+      }))
+    ));
+    const { error: error3 } = await supabase
+      .from("mcq_choices")
+      .insert(mcqChoices);
+    if (error3) {
+      throw error3;
     }
   }
 
