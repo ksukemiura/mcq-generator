@@ -76,7 +76,7 @@ export default function Page() {
     }
 
     // Save MCQ choices into Supabase
-    const mcqChoices = mcqs.flatMap(({ choices, answerIndex }, questionIndex) => (
+    const mcqChoices = mcqs.flatMap(({ choices, answer_index: answerIndex }, questionIndex) => (
       choices.map((choice, choiceIndex) => ({
         mcq_question_id: mcqQuestionIds[questionIndex],
         choice: choice,
