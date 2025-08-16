@@ -41,8 +41,8 @@ export default function Page() {
       const mcqs: MCQ[] = await res.json();
 
       await saveMcqSet(mcqs, "test");
-    } catch (error: any) {
-      console.error(error?.message || "Something went wrong");
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
