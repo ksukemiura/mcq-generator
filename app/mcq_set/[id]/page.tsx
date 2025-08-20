@@ -3,45 +3,28 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import type { Database } from "@/database.types";
 
-type McqChoice = {
-  id: string,
-  choice: string,
-  is_correct: boolean,
-}
-
-type McqQuestion = {
-  id: string,
-  question: string,
-  created_at: string,
-  mcq_choices: McqChoice[],
-}
+type McqQuestion = Database["public"]["Tables"]["mcq_questions"]["Row"];
+type McqChoice = Database["public"]["Tables"]["mcq_choices"]["Row"];
+type McqQuestionWithChoices = McqQuestion & { mcq_choices: McqChoice[] };
 
 export default function Page() {
   const supabase = createClient();
   const { id: mcqSetId } = useParams<{ id: string }>();
-  const [mcqQuestions, setMcqQuestions] = useState<McqQuestion[]>([]);
+  const [mcqQuestions, setMcqQuestions] = useState<McqQuestionWithChoices[]>([]);
 
-  async function getMcqQuestions(mcqSetId: string): Promise<McqQuestion[]> {
+  async function getMcqQuestions(mcqSetId: string): Promise<McqQuestionWithChoices[]> {
     const { data, error } = await supabase
       .from("mcq_questions")
-      .select(`
-        id,
-        question,
-        created_at,
-        mcq_choices (
-          id,
-          choice,
-          is_correct
-        )
-      `)
+      .select("*, mcq_choices (*)")
       .eq("mcq_set_id", mcqSetId)
       .order("created_at", { ascending: false });
     if (error) {
       throw error;
     }
     console.log(data);
-    return data;
+    return (data ?? []) as McqQuestionWithChoices[];
   }
 
   useEffect(() => {

@@ -3,12 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import type { Database } from "@/database.types";
 
-type McqSet = {
-  id: string,
-  title: string,
-  created_at: string,
-}
+type McqSet = Database["public"]["Tables"]["mcq_sets"]["Row"];
 
 export default function Page() {
   const [mcqSets, setMcqSets] = useState<McqSet[]>([]);
