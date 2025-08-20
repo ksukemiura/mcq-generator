@@ -3,6 +3,7 @@ import {
   NextResponse,
 } from "next/server";
 import OpenAI from "openai";
+import type { MCQ } from "@/types/mcq";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -11,12 +12,6 @@ export async function POST(request: NextRequest) {
   const result = await generateMcqsFromText(text);
   return NextResponse.json(result);
 }
-
-type MCQ = {
-  question: string;
-  choices: [string, string, string, string];
-  answer_index: 0 | 1 | 2 | 3;
-};
 
 async function generateMcqsFromText(text: string): Promise<MCQ[]> {
   const response = await client.responses.create({

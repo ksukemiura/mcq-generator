@@ -2,17 +2,14 @@
 
 import React, { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import type { MCQ } from "@/types/mcq";
 import styles from "./page.module.css";
-
-type MCQ = {
-  question: string;
-  choices: [string, string, string, string];
-  answer_index: 0 | 1 | 2 | 3;
-};
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -20,9 +17,10 @@ export default function Page() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
+    const title = String(formData.get("title")).trim();
     const text = String(formData.get("text")).trim();
 
-    if (!text) {
+    if (!title || !text) {
       setLoading(false);
       return;
     }
@@ -41,7 +39,8 @@ export default function Page() {
 
       const mcqs: MCQ[] = await res.json();
 
-      await saveMcqSet(mcqs, "test");
+      const mcqSetId = await saveMcqSet(mcqs, title);
+      router.push(`/mcq_set/${mcqSetId}`);
     } catch (error) {
       console.error(error);
     } finally {
@@ -49,7 +48,7 @@ export default function Page() {
     }
   }
 
-  async function saveMcqSet(mcqs: MCQ[], title: string) {
+  async function saveMcqSet(mcqs: MCQ[], title: string): Promise<string> {
     // Save a MCQ set into Supabase
     const mcqSetId = crypto.randomUUID();
     const { error: error1 } = await supabase
@@ -90,6 +89,8 @@ export default function Page() {
     if (error3) {
       throw error3;
     }
+  
+    return mcqSetId;
   }
 
   return (
@@ -98,6 +99,13 @@ export default function Page() {
         onSubmit={handleSubmit}
         className={styles.form}
       >
+        <input
+          type="text"
+          name="title"
+          placeholder="Enter MCQ set title"
+          required
+          className={styles.textInput}
+        />
         <textarea
           name="text"
           placeholder="Enter your question"

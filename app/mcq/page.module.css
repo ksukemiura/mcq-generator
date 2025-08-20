@@ -4,6 +4,29 @@
   max-width: 720px;
 }
 
+.textInput {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  outline: none;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04) inset;
+}
+
+.textInput::placeholder {
+  color: #9ca3af;
+}
+
+.textInput:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+}
+
 .textarea {
   width: 100%;
   min-height: 500px;
