@@ -2,13 +2,8 @@
 
 import React, { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import type { MCQ } from "@/types/mcq";
 import styles from "./page.module.css";
-
-type MCQ = {
-  question: string;
-  choices: [string, string, string, string];
-  answer_index: 0 | 1 | 2 | 3;
-};
 
 export default function Page() {
   const supabase = createClient();
