@@ -1,0 +1,92 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.questionItem {
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 14px;
+  background: var(--card, #fff);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.questionText {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.choices {
+  display: grid;
+  gap: 8px;
+}
+
+.choiceLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  background: var(--background, #fff);
+}
+
+.choiceLabel:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+.choiceLabelChecked {
+  border-color: rgb(59, 130, 246);
+  background: rgba(59, 130, 246, 0.06);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.radio {
+  accent-color: rgb(59, 130, 246);
+}
+
+.choiceText {
+  flex: 1;
+}
+
+.submitBtn {
+  min-width: 120px;
+  display: block;
+  margin: 24px auto 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .questionItem {
+    border-color: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+  }
+  .choiceLabel {
+    border-color: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+  }
+  .choiceLabel:hover {
+    background: rgba(255,255,255,0.06);
+  }
+}
