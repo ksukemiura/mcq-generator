@@ -11,10 +11,10 @@ type McqSet = {
 }
 
 export default function Page() {
-  const supabase = createClient();
   const [mcqSets, setMcqSets] = useState<McqSet[]>([]);
 
   async function getMcqSets(): Promise<McqSet[]> {
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("mcq_sets")
       .select();
@@ -29,7 +29,7 @@ export default function Page() {
       const mcqSets = await getMcqSets();
       setMcqSets(mcqSets);
     })();
-  }, [supabase]);
+  }, []);
 
   return (
     <>
