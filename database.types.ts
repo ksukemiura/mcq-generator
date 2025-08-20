@@ -90,6 +90,84 @@ export type Database = {
           },
         ]
       }
+      mcq_session_answers: {
+        Row: {
+          created_at: string
+          id: string
+          is_correct: boolean
+          mcq_choice_id: string
+          mcq_question_id: string
+          mcq_session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_correct: boolean
+          mcq_choice_id: string
+          mcq_question_id: string
+          mcq_session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          mcq_choice_id?: string
+          mcq_question_id?: string
+          mcq_session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mcq_session_answers_mcq_choice_id_fkey"
+            columns: ["mcq_choice_id"]
+            isOneToOne: false
+            referencedRelation: "mcq_choices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mcq_session_answers_mcq_question_id_fkey"
+            columns: ["mcq_question_id"]
+            isOneToOne: false
+            referencedRelation: "mcq_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mcq_session_answers_mcq_session_id_fkey"
+            columns: ["mcq_session_id"]
+            isOneToOne: false
+            referencedRelation: "mcq_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mcq_sessions: {
+        Row: {
+          correct_count: number | null
+          created_at: string
+          id: string
+          mcq_set_id: string
+        }
+        Insert: {
+          correct_count?: number | null
+          created_at?: string
+          id?: string
+          mcq_set_id: string
+        }
+        Update: {
+          correct_count?: number | null
+          created_at?: string
+          id?: string
+          mcq_set_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mcq_sessions_mcq_set_id_fkey"
+            columns: ["mcq_set_id"]
+            isOneToOne: false
+            referencedRelation: "mcq_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mcq_sets: {
         Row: {
           created_at: string

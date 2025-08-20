@@ -77,6 +77,59 @@
   margin: 24px auto 0;
 }
 
+.score {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.sessionMeta {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.questionHeader {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.choiceCard {
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+}
+
+.choiceCard.selectedCorrect {
+  border: 2px solid #16a34a;
+}
+
+.choiceCard.selectedWrong {
+  border: 2px solid #dc2626;
+}
+
+.choiceCard.correctChoice {
+  border: 1px solid rgba(22, 163, 74, 0.4);
+}
+
+.choiceTextSelected {
+  font-weight: 600;
+}
+
+.answerNote {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 @media (prefers-color-scheme: dark) {
   .questionItem {
     border-color: rgba(255,255,255,0.08);

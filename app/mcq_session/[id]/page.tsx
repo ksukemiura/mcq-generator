@@ -10,12 +10,12 @@ import styles from "./page.module.css";
 type McqQuestion = Database["public"]["Tables"]["mcq_questions"]["Row"];
 type McqChoice = Database["public"]["Tables"]["mcq_choices"]["Row"];
 type McqQuestionWithChoices = McqQuestion & { mcq_choices: McqChoice[] };
+type McqSessionAnswer = Database["public"]["Tables"]["mcq_session_answers"]["Row"];
 
 export default function Page() {
   const supabase = createClient();
   const { id: sessionId } = useParams<{ id: string }>();
 
-  const [mcqSetId, setMcqSetId] = useState<string | null>(null);
   const [mcqSetTitle, setMcqSetTitle] = useState<string | null>(null);
   const [questions, setQuestions] = useState<McqQuestionWithChoices[]>([]);
   const [selections, setSelections] = useState<Record<string, string>>({});
@@ -31,7 +31,6 @@ export default function Page() {
         if (sessionError) {
           throw sessionError;
         }
-        setMcqSetId(session.mcq_set_id);
 
         const { data: mcqSet, error: mcqSetError } = await supabase
           .from("mcq_sets")
@@ -71,16 +70,33 @@ export default function Page() {
   }
 
   async function onSubmit() {
-    if (!allAnswered) {
-      alert("Please answer all questions before submitting.");
-      return;
+    try {
+      if (!sessionId) {
+        throw new Error("No session id");
+      }
+      if (!questions.length) {
+        throw new Error("No questions loaded");
+      }
+
+      const mcqSessionAnswers =
+        questions.map((question) => ({
+          mcq_session_id: sessionId,
+          mcq_question_id: question.id,
+          mcq_choice_id: selections[question.id],
+        }));
+
+      const { error } = await supabase
+        .from("mcq_session_answers")
+        .upsert(mcqSessionAnswers, { onConflict: "mcq_session_id,mcq_question_id" });
+
+      if (error) {
+        throw error;
+      }
+
+      // e.g., router.push(`/sessions/${sessionId}/result`)
+    } catch (error) {
+      console.error(error);
     }
-    console.log("Submitting selections", {
-      sessionId,
-      mcqSetId,
-      selections,
-    });
-    alert("Submitted! (Selections logged in console)");
   }
 
   return (
